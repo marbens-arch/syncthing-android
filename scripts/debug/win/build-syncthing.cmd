@@ -6,6 +6,7 @@ setlocal enabledelayedexpansion
 ::
 SET BUILD_HOST=Catfriend1-syncthing-android
 SET BUILD_USER=reproducible-build
+SET SOURCE_DATE_EPOCH=0
 :: SET EXTRA_LDFLAGS=-buildid=
 SET SYNCTHING_VERSION=-version "v2.0.0-reproducibleBuildTest"
 ::
