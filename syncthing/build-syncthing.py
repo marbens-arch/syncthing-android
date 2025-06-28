@@ -338,7 +338,7 @@ for target in BUILD_TARGETS:
         'GOPATH': module_dir,
         'GO111MODULE': 'on',
         'CGO_ENABLED': '1',
-        'EXTRA_LDFLAGS': '-buildid= -checklinkname=0',
+        'EXTRA_LDFLAGS': '-checklinkname=0',
     })
 
     subprocess.check_call([go_bin, 'mod', 'download'], cwd=syncthing_dir)
