@@ -4,6 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.net.RouteInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Build;
@@ -30,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -506,6 +512,8 @@ public class SyncthingRunnable implements Runnable {
         LogV("Setting env var: [GOGC]=[" + Integer.toString(gogc) + "]");
         targetEnv.put("GOGC", Integer.toString(gogc));
 
+        Log.e(TAG, "TEST " + getGatewayIp(mContext));
+
         putCustomEnvironmentVariables(targetEnv, mPreferences);
         return targetEnv;
     }
@@ -562,5 +570,22 @@ public class SyncthingRunnable implements Runnable {
         if (ENABLE_VERBOSE_LOG) {
             Log.v(TAG, logMessage);
         }
+    }
+
+    public static String getGatewayIp(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        Network activeNetwork = cm.getActiveNetwork();
+        if (activeNetwork == null) return null;
+
+        LinkProperties props = cm.getLinkProperties(activeNetwork);
+        if (props == null) return null;
+
+        for (RouteInfo route : props.getRoutes()) {
+            InetAddress gateway = route.getGateway();
+            if (route.isDefaultRoute() && gateway instanceof Inet4Address) {
+                return gateway.getHostAddress();
+            }
+        }
+        return null;
     }
 }
