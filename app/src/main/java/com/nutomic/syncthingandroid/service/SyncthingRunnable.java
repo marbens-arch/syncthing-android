@@ -17,6 +17,8 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.nutomic.syncthingandroid.R;
@@ -493,7 +495,9 @@ public class SyncthingRunnable implements Runnable {
         targetEnv.put("STDBDELETERETENTIONINTERVAL", "8766h");
 
         // Workaround SyncthingNativeCode denied to read gatewayIP by Android 14+ restriction.
-        targetEnv.put("ANDROID_NET_GATEWAY_IPV4", getGatewayIpV4(mContext));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            targetEnv.put("ANDROID_NET_GATEWAY_IPV4", getGatewayIpV4(mContext));
+        }
 
         if (mPreferences.getBoolean(Constants.PREF_USE_TOR, false)) {
             targetEnv.put("all_proxy", "socks5://localhost:9050");
@@ -579,6 +583,7 @@ public class SyncthingRunnable implements Runnable {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public static String getGatewayIpV4(final Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Network activeNetwork = cm.getActiveNetwork();
