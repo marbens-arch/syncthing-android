@@ -492,6 +492,9 @@ public class SyncthingRunnable implements Runnable {
         // Since Syncthing v2+: purge deletes from database after 1 year.
         targetEnv.put("STDBDELETERETENTIONINTERVAL", "8766h");
 
+        // Workaround SyncthingNativeCode denied to read gatewayIP by Android 14+ restriction.
+        targetEnv.put("ANDROID_NET_GATEWAY_IPV4", getGatewayIpV4(mContext));
+
         if (mPreferences.getBoolean(Constants.PREF_USE_TOR, false)) {
             targetEnv.put("all_proxy", "socks5://localhost:9050");
             targetEnv.put("ALL_PROXY_NO_FALLBACK", "1");
@@ -517,8 +520,6 @@ public class SyncthingRunnable implements Runnable {
         }
         LogV("Setting env var: [GOGC]=[" + Integer.toString(gogc) + "]");
         targetEnv.put("GOGC", Integer.toString(gogc));
-
-        Log.e(TAG, "TEST " + getGatewayIp(mContext));
 
         putCustomEnvironmentVariables(targetEnv, mPreferences);
         return targetEnv;
@@ -578,7 +579,7 @@ public class SyncthingRunnable implements Runnable {
         }
     }
 
-    public static String getGatewayIp(Context context) {
+    public static String getGatewayIpV4(final Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Network activeNetwork = cm.getActiveNetwork();
         if (activeNetwork == null) return null;
